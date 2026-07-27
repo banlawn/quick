@@ -13,14 +13,17 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --ink: #101838;
     --ink-soft: #606b94;
-    /* 95%透明玻璃基底 5%白色填充 */
-    --glass-fill: rgba(255,255,255,0.05);
-    --blur-depth: 40px;
-    --saturate-lens: 190%;
-    --fresnel-rim: rgba(255,255,255,0.14);
-    --top-specular: rgba(255,255,255,0.22);
-    --bottom-thickness: rgba(0,0,0,0.03);
-    --distort-scale: 8;
+    /* 液态玻璃基底参数升级 */
+    --glass-fill: rgba(255,255,255,0.06);
+    --glass-fill-hover: rgba(255,255,255,0.09);
+    --blur-depth: 42px;
+    --saturate-lens: 200%;
+    --fresnel-rim: rgba(255,255,255,0.16);
+    --top-specular: rgba(255,255,255,0.26);
+    --bottom-thickness: rgba(0,0,0,0.04);
+    --distort-scale: 7.5;
+    --distort-scale-hover: 11;
+    --fresnel-edge: rgba(255, 255, 255, 0.3);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
@@ -96,6 +99,8 @@
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 14px 30px rgba(79,140,255,.35);
     animation: pop .6s cubic-bezier(.2,.8,.3,1.2) both;
+    /* 同步液态玻璃滤镜 */
+    filter: url(#liquidGlassDistort);
   }
   .logo svg { width: 40px; height: 40px; fill: #fff; }
   .title { font-size: 26px; font-weight: 800; letter-spacing: 3px; animation: pop .6s .06s cubic-bezier(.2,.8,.3,1.2) both; }
@@ -103,15 +108,17 @@
 
   .players { display: flex; flex-direction: column; gap: 28px; margin: 36px 0 28px; }
 
-  /* 苹果液态玻璃核心按钮 */
+  /* 苹果WWDC25液态玻璃核心按钮【重度美化升级】 */
   .player-btn {
     display: flex; align-items: center; gap: 16px;
     padding: 24px 24px;
     border-radius: 32px;
     text-decoration: none; color: var(--ink);
     background: var(--glass-fill);
+    /* 多层复合液态滤镜 + 磨砂模糊 + 色彩饱和透镜 */
     backdrop-filter: url(#liquidGlassDistort) blur(var(--blur-depth)) saturate(var(--saturate-lens));
     -webkit-backdrop-filter: url(#liquidGlassDistort) blur(var(--blur-depth)) saturate(var(--saturate-lens));
+    /* 四层立体玻璃光影：外阴影+顶部高光+边缘菲涅尔折射边框+底部厚度阴影 */
     box-shadow:
       0 14px 48px rgba(10, 16, 45, 0.04),
       inset 0 1.4px 0 var(--top-specular),
@@ -122,33 +129,36 @@
     animation: slideUp .5s both;
     isolation: isolate;
     cursor: pointer;
+    /* 边缘液态膨胀基础 */
+    border: 1px solid transparent;
   }
   .player-btn:nth-child(1) { animation-delay: .18s; }
   .player-btn:nth-child(2) { animation-delay: .26s; }
 
   .player-btn:hover {
     transform: translateY(-10px) scale(1.018);
-    background: rgba(255,255,255,0.07);
+    background: var(--glass-fill-hover);
+    --distort-scale: var(--distort-scale-hover);
     box-shadow:
       0 26px 66px rgba(10, 16, 45, 0.07),
-      inset 0 1.4px 0 rgba(255,255,255,0.28),
-      inset 0 0 0 1px rgba(255,255,255,0.18),
+      inset 0 1.4px 0 rgba(255,255,255,0.32),
+      inset 0 0 0 1px var(--fresnel-edge),
       inset 0 -1.4px 0 rgba(0,0,0,0.02);
   }
   .player-btn:active { transform: scale(0.94) translateY(0); box-shadow: 0 6px 24px rgba(10, 16, 45, 0.03); }
 
-  /* 顶部微弱静态高光 */
+  /* 顶部静态菲涅尔高光层 */
   .player-btn::before {
     content: ""; position: absolute; top: 0; left: 0; right: 0; height: 35%;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.12), transparent);
+    background: linear-gradient(to bottom, rgba(255,255,255,0.14), transparent);
     border-radius: inherit;
     pointer-events: none;
     mix-blend-mode: screen;
   }
-  /* Hover极淡扫光 */
+  /* Hover动态扫光（液态流动反光） */
   .player-btn::after {
     content: ""; position: absolute; inset: 0; border-radius: inherit;
-    background: linear-gradient(105deg, transparent 32%, rgba(255,255,255,0.18) 48%, rgba(255,255,255,0.06) 54%, transparent 70%);
+    background: linear-gradient(105deg, transparent 32%, rgba(255,255,255,0.22) 48%, rgba(255,255,255,0.08) 54%, transparent 70%);
     transform: skewX(-30deg) translateX(-140%);
     transition: transform 1.1s ease;
     pointer-events: none;
@@ -161,6 +171,7 @@
     border-radius: 18px;
     display: flex; align-items: center; justify-content: center;
     box-shadow: inset 0 2px 0 rgba(255,255,255,0.35);
+    filter: url(#liquidGlassDistortMini);
   }
   .icon svg { width: 24px; height: 24px; fill: #fff; }
   .p1 .icon { background: linear-gradient(135deg, #4f8cff, #2f6bff); box-shadow: 0 8px 18px rgba(47,107,255,.4); }
@@ -171,6 +182,7 @@
   .badge {
     font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
     background: linear-gradient(135deg, #4f8cff, #a44bff); color: #fff;
+    filter: url(#liquidGlassDistortMini);
   }
   .info .desc { font-size: 12.5px; color: var(--ink-soft); margin-top: 5px; }
   .arrow {
@@ -179,6 +191,7 @@
     display: flex; align-items: center; justify-content: center;
     color: var(--ink-soft); font-size: 18px; flex-shrink: 0;
     transition: all 0.3s ease;
+    filter: url(#liquidGlassDistortMini);
   }
   .player-btn:hover .arrow { background: rgba(79,140,255,0.16); color: #4f8cff; }
 
@@ -193,13 +206,13 @@
   @keyframes pop { from{ opacity:0; transform: translateY(12px) scale(.96) } to{ opacity:1; transform: none } }
   @keyframes slideUp { from{ opacity:0; transform: translateY(24px) } to{ opacity:1; transform: none } }
 
-  /* ===================== 全屏iframe容器（修复黑屏+拉伸动画） ===================== */
+  /* ===================== 全屏iframe容器（同步液态玻璃风格） ===================== */
   .fullscreen-view {
     position: fixed;
     inset: 0;
     z-index: 999;
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(10px);
+    background: rgba(0,0,0,0.82);
+    backdrop-filter: blur(14px) saturate(160%);
     opacity: 0;
     pointer-events: none;
     transform: scale(0.92);
@@ -210,7 +223,7 @@
     pointer-events: all;
     transform: scale(1);
   }
-  /* 右上角返回按钮，适配手机顶部安全区 */
+  /* 右上角返回按钮，液态玻璃统一样式 */
   .back-btn {
     position: fixed;
     top: calc(var(--safe-top) + 16px);
@@ -218,9 +231,9 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.22);
     color: #fff;
     font-size: 22px;
     display: flex;
@@ -229,9 +242,12 @@
     cursor: pointer;
     z-index: 1000;
     transition: all 0.2s ease;
+    filter: url(#liquidGlassDistortMini);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
   }
   .back-btn:hover {
-    background: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.28);
+    transform: scale(1.08);
   }
   /* 全屏网页iframe */
   .page-iframe {
@@ -249,6 +265,7 @@
     color: #fff;
     font-size: 16px;
     display: none;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.3);
   }
   .fullscreen-view.loading .loading-tip {
     display: block;
@@ -256,19 +273,43 @@
 </style>
 </head>
 <body>
-<!-- SVG液态玻璃光学折射滤镜 -->
+<!-- SVG液态玻璃光学复合滤镜【升级分层渲染：噪点→柔化置换→高斯模糊→菲涅尔提亮→轻微锐化】 -->
 <svg width="0" height="0" style="position:absolute;overflow:hidden;">
-  <filter id="liquidGlassDistort" x="-10%" y="-10%" width="120%" height="120%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="2" result="noise"/>
-    <feGaussianBlur in="noise" stdDeviation="1.5" result="softNoise"/>
-    <feDisplacementMap
-      in="SourceGraphic"
-      in2="softNoise"
-      scale="var(--distort-scale)"
-      xChannelSelector="R"
-      yChannelSelector="G"
-      result="distorted"/>
-  </filter>
+  <defs>
+    <!-- 主液态玻璃滤镜：卡片大组件使用，强折射边缘变形 -->
+    <filter id="liquidGlassDistort" x="-12%" y="-12%" width="124%" height="124%">
+      <!-- 1. 生成分层分形噪点，自然液态纹理 -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.0055" numOctaves="3" seed="6" result="rawNoise"/>
+      <!-- 2. 噪点柔化，消除锯齿扭曲 -->
+      <feGaussianBlur in="rawNoise" stdDeviation="2" result="smoothNoise"/>
+      <!-- 3. 核心置换映射：边缘折射变形，匹配WWDC25液态膨胀 -->
+      <feDisplacementMap
+        in="SourceGraphic"
+        in2="smoothNoise"
+        scale="var(--distort-scale)"
+        xChannelSelector="R"
+        yChannelSelector="G"
+        result="distortLayer"/>
+      <!-- 4. 菲涅尔高光提亮，模拟玻璃反光 -->
+      <feComposite in="distortLayer" operator="arithmetic" k1="0" k2="0.92" k3="0.22" k4="0" result="brightGlass"/>
+      <!-- 5. 轻微锐化修复文字模糊问题 -->
+      <feUnsharpMask stdDeviation="0.7" amount="0.55"/>
+    </filter>
+
+    <!-- 小型元素专用迷你液态滤镜：图标、按钮、徽章，弱扭曲不破坏细节 -->
+    <filter id="liquidGlassDistortMini" x="-8%" y="-8%" width="116%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="3" result="miniNoise"/>
+      <feGaussianBlur in="miniNoise" stdDeviation="1" result="miniSmooth"/>
+      <feDisplacementMap
+        in="SourceGraphic"
+        in2="miniSmooth"
+        scale="3.5"
+        xChannelSelector="R"
+        yChannelSelector="G"
+        result="miniDistort"/>
+      <feComposite in="miniDistort" operator="arithmetic" k1="0" k2="0.96" k3="0.14" k4="0"/>
+    </filter>
+  </defs>
 </svg>
 
 <!-- 全屏页面容器（默认隐藏） -->
@@ -298,7 +339,7 @@
 
   <div class="players">
     <!-- data-href 存放要加载的网址 -->
-    <div class="player-btn p1" data-href="https://ek.saygugugaga.dpdns.org">
+    <div class="player-btn p1" data-href="https://ek.saygugugugaga.dpdns.org">
       <span class="icon">
         <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
       </span>
@@ -376,5 +417,6 @@ backBtn.addEventListener('click', () => {
   iframe.src = '';
 })
 </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"68f099c02d1b4505bb386863c1a04323","r":1}' crossorigin="anonymous"></script>
 </body>
 </html>
